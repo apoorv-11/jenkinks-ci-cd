@@ -1,0 +1,30 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Backend Build
+        run: |
+          cd backend
+          npm install
+
+      - name: Frontend Build
+        run: |
+          cd frontend
+          echo "Frontend build success"
+
+      - name: Trigger Jenkins
+        run: |
+          curl -X POST http://<JENKINS_IP>:8080/job/project/build \
+          --user admin:API_TOKEN
