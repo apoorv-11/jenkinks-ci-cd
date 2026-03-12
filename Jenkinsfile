@@ -16,22 +16,31 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh "docker build -t $IMAGE_NAME-backend:$COMMIT_HASH ./backend"
-                sh "docker build -t $IMAGE_NAME-frontend:$COMMIT_HASH ./frontend"
+                bat "docker build -t %IMAGE_NAME%-backend:%COMMIT_HASH% backend"
+                bat "docker build -t %IMAGE_NAME%-frontend:%COMMIT_HASH% frontend"
             }
         }
 
         stage('Security Scan') {
             steps {
-                sh "trivy image $IMAGE_NAME-backend:$COMMIT_HASH"
+                bat "trivy image %IMAGE_NAME%-backend:%COMMIT_HASH%"
             }
         }
 
         stage('Deploy') {
             steps {
-                sh "docker-compose down"
-                sh "docker-compose up -d"
+                bat "docker-compose down"
+                bat "docker-compose up -d --build"
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
         }
     }
 }
